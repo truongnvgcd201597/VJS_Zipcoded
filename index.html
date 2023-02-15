@@ -103,7 +103,12 @@
             document.getElementById("output").innerHTML = output;
 
             //Clear field
-            
+            const zip = document.querySelector(".zip");
+            zip.value = "";
+            // delete button
+            document.querySelector('.delete').addEventListener('click', ()=>{
+              document.getElementById('output').innerHTML = '';
+            })
           })
           .catch((rej) => console.log(rej));
       }
