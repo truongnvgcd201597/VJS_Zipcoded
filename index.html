@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css"
+      integrity="sha512-HqxHUkJM0SYcbvxUw5P60SzdOTy/QVwA1JJrvaXJv4q7lmbDZCmZaqz01UPOaQveoxfYRv1tHozWGPMcuTBuvQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+      integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>Zip Code Galore Location Finder</title>
+    <style>
+      .icon-check,
+      .icon-remove {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="hero hero-body is-dark container">
+      <h1 class="title">US Location Info</h1>
+      <h2 class="subtitle">Enter a zipcode to get the location info</h2>
+      <form id="zipForm">
+        <div class="field">
+          <div class="control has-icons-left has-icons-right">
+            <input
+              class="input zip is-large"
+              type="text"
+              placeholder="enter your zip..."
+            />
+            <span class="icon is-small is-left">
+              <i class="fas fa-map-pin"></i>
+            </span>
+            <span class="icon is-small is-right icon-check">
+              <i class="fas fa-check"></i>
+            </span>
+            <span class="icon is-small is-right icon-remove">
+              <i class="fas fa-remove"></i>
+            </span>
+          </div>
+        </div>
+      </form>
+    </section>
+    <br />
+    <div class="container">
+      <div id="output"></div>
+    </div>
+    <script>
+      const zipForm = document
+        .getElementById("zipForm")
+        .addEventListener("submit", getLocationInfo);
+
+      function getLocationInfo(e) {
+        e.preventDefault();
+        const zip = document.querySelector(".zip").value;
+        // Init request
+        fetch(`http://api.zippopotam.us/us/${zip}`)
+          .then((res) => {
+            if (res.status !== 200) {
+              showIcon("remove");
+              document.getElementById("output").innerHTML = `
+            <article class="message message-body is-danger">
+              404 Not Found! Try again
+            </div>
+            </article>
+            `;
+              throw new Error(res.statusText);
+            } else {
+              showIcon("check");
+              return res.json();
+            }
+          })
+          .then((res) => {
+            let output = "";
+            res.places.forEach((place) => {
+              output += `
+              <article class="message is-primary">
+                <div class="message-header">
+                  <p>Location Info</p>
+                  <button class="delete"></button>
+                </div>
+                <div class="message-body">
+                  <ul>
+                    <li><strong>City: </strong>${place["place name"]}</li>
+                    <li><strong>State: </strong>${place["state"]}</li>
+                    <li><strong>Longitude: </strong>${place["longitude"]}</li>
+                    <li><strong>Latitude: </strong>${place["latitude"]}</li>
+                  </ul>
+                </div>
+              </article>
+              `;
+            });
+            document.getElementById("output").innerHTML = output;
+
+            //Clear field
+            
+          })
+          .catch((rej) => console.log(rej));
+      }
+
+      function showIcon(icon) {
+        document.querySelector(".icon-check").style.display = "none";
+        document.querySelector(".icon-remove").style.display = "none";
+        document.querySelector(`.icon-${icon}`).style.display = "inline-flex";
+      }
+
+      // post code, country, country abbreviation, place
+    </script>
+  </body>
+</html>
